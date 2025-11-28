@@ -34,7 +34,7 @@ export function useAmbulances() {
     queryKey: queryKeys.ambulances,
     queryFn: async () => {
       const response = await api.getAmbulances()
-      const ambulances = response.data.map((item) =>
+      const ambulances = (Array.isArray(response) ? response : []).map((item) =>
         ambulanceSchema.parse(item)
       ) as Ambulance[]
       dispatch(setAmbulances(ambulances))
@@ -50,7 +50,7 @@ export function useAmbulance(id: string) {
     queryKey: queryKeys.ambulance(id),
     queryFn: async () => {
       const response = await api.getAmbulance(id)
-      return ambulanceSchema.parse(response.data) as Ambulance
+      return ambulanceSchema.parse(response) as Ambulance
     },
     enabled: !!id,
   })
@@ -72,7 +72,7 @@ export function useIncidents(filters?: Record<string, unknown>) {
           )
         : undefined
       const response = await api.getIncidents(params)
-      const incidents = response.data.map((item) =>
+      const incidents = (Array.isArray(response) ? response : []).map((item) =>
         incidentSchema.parse(item)
       ) as Incident[]
       dispatch(setIncidents(incidents))
@@ -88,7 +88,7 @@ export function useIncident(id: string) {
     queryKey: queryKeys.incident(id),
     queryFn: async () => {
       const response = await api.getIncident(id)
-      return incidentSchema.parse(response.data) as Incident
+      return incidentSchema.parse(response) as Incident
     },
     enabled: !!id,
   })
@@ -100,10 +100,55 @@ export function useStatistics() {
     queryKey: queryKeys.statistics,
     queryFn: async () => {
       const response = await api.getStatistics()
-      return statisticsSchema.parse(response.data) as Statistics
+      return statisticsSchema.parse(response) as Statistics
     },
     staleTime: 60000, // 1 minute
     refetchInterval: 60000,
+  })
+}
+
+// History queries
+export function useHistory(filters?: Record<string, unknown>) {
+  return useQuery({
+    queryKey: ["history", filters],
+    queryFn: async () => {
+      const params = filters
+        ? Object.fromEntries(
+            Object.entries(filters).map(([key, value]) => [
+              key,
+              String(value),
+            ])
+          )
+        : undefined
+      const response = await api.getHistory(params)
+      return (Array.isArray(response) ? response : []).map((item) =>
+        incidentSchema.parse(item)
+      ) as Incident[]
+    },
+    staleTime: 300000, // 5 minutes (history doesn't change often)
+  })
+}
+
+// Activity query
+export function useActivity(limit?: number) {
+  return useQuery({
+    queryKey: ["activity", limit],
+    queryFn: async () => {
+      const params = limit ? { _limit: String(limit) } : undefined
+      const response = await api.getActivity(params)
+      return (Array.isArray(response) ? response : []) as Array<{
+        id: string
+        type: string
+        description: string
+        timestamp: string
+        incidentId?: string
+        ambulanceId?: string
+        userId?: string
+        metadata?: Record<string, unknown>
+      }>
+    },
+    staleTime: 30000, // 30 seconds
+    refetchInterval: 30000,
   })
 }
 
@@ -115,7 +160,7 @@ export function useCreateIncident() {
   return useMutation({
     mutationFn: async (payload: CreateIncidentPayload) => {
       const response = await api.createIncident(payload)
-      return incidentSchema.parse(response.data) as Incident
+      return incidentSchema.parse(response) as Incident
     },
     onMutate: async (newIncident) => {
       // Cancel outgoing refetches
@@ -179,7 +224,7 @@ export function useUpdateIncident() {
     mutationFn: async (payload: UpdateIncidentPayload) => {
       const { id, ...updates } = payload
       const response = await api.updateIncident(id, updates)
-      return incidentSchema.parse(response.data) as Incident
+      return incidentSchema.parse(response) as Incident
     },
     onMutate: async (updatedIncident) => {
       await queryClient.cancelQueries({
@@ -255,7 +300,7 @@ export function useAssignAmbulance() {
         status: "assigned",
         assignedAt: new Date().toISOString(),
       })
-      return incidentSchema.parse(response.data) as Incident
+      return incidentSchema.parse(response) as Incident
     },
     onMutate: async ({ incidentId, ambulanceId }) => {
       await queryClient.cancelQueries({
@@ -329,7 +374,7 @@ export function useUpdateAmbulanceStatus() {
       status: Ambulance["status"]
     }) => {
       const response = await api.updateAmbulance(id, { status })
-      return ambulanceSchema.parse(response.data) as Ambulance
+      return ambulanceSchema.parse(response) as Ambulance
     },
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.ambulance(data.id), data)

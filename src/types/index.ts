@@ -10,11 +10,12 @@ export interface Ambulance {
     lat: number
     lng: number
   }
-  currentIncidentId?: string
+  currentIncidentId?: string | null
   crew: {
     driver: string
     medic: string
   }
+  equipment?: string[]
   lastUpdate: string
 }
 
@@ -25,6 +26,17 @@ export interface AmbulanceFilters {
 
 // Incident types
 export type EmergencyLevel = "low" | "medium" | "high" | "critical"
+
+export interface Patient {
+  name: string
+  age: number | null
+  condition: string
+  vitalSigns?: {
+    heartRate: number
+    bloodPressure: string
+    oxygenSaturation: number
+  } | null
+}
 
 export interface Incident {
   id: string
@@ -46,6 +58,7 @@ export interface Incident {
     name: string
     phone: string
   }
+  patient?: Patient
 }
 
 export interface IncidentFilters {
@@ -71,6 +84,7 @@ export interface CreateIncidentPayload {
     name: string
     phone: string
   }
+  patient?: Patient
 }
 
 export interface UpdateIncidentPayload {

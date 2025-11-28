@@ -1,33 +1,473 @@
 {
   "ambulances": [
     {
-      "id": 1,
+      "id": "amb-001",
       "name": "AMB-001",
+      "plateNumber": "75-AMB-001",
       "status": "available",
-      "position": { "lat": 48.8566, "lng": 2.3522 },
-      "crew": ["Dr. Dupont", "Inf. Martin"],
-      "equipment": ["Defibrillator", "Oxygen"],
-      "lastUpdate": "2024-01-15T10:30:00Z"
+      "location": {
+        "lat": 48.8566,
+        "lng": 2.3522
+      },
+      "currentIncidentId": null,
+      "crew": {
+        "driver": "Pierre Martin",
+        "medic": "Dr. Sophie Dubois"
+      },
+      "equipment": [
+        "Defibrillator",
+        "Oxygen Tank",
+        "First Aid Kit",
+        "Stretcher",
+        "ECG Monitor"
+      ],
+      "lastUpdate": "2024-01-20T14:30:00Z"
+    },
+    {
+      "id": "amb-002",
+      "name": "AMB-002",
+      "plateNumber": "75-AMB-002",
+      "status": "busy",
+      "location": {
+        "lat": 48.8606,
+        "lng": 2.3376
+      },
+      "currentIncidentId": "inc-001",
+      "crew": {
+        "driver": "Jean Dupont",
+        "medic": "Dr. Marie Leclerc"
+      },
+      "equipment": [
+        "Defibrillator",
+        "Oxygen Tank",
+        "First Aid Kit",
+        "Stretcher",
+        "ECG Monitor",
+        "Ventilator"
+      ],
+      "lastUpdate": "2024-01-20T14:25:00Z"
+    },
+    {
+      "id": "amb-003",
+      "name": "AMB-003",
+      "plateNumber": "75-AMB-003",
+      "status": "available",
+      "location": {
+        "lat": 48.8534,
+        "lng": 2.3488
+      },
+      "currentIncidentId": null,
+      "crew": {
+        "driver": "Marc Bernard",
+        "medic": "Dr. Claire Moreau"
+      },
+      "equipment": [
+        "Defibrillator",
+        "Oxygen Tank",
+        "First Aid Kit",
+        "Stretcher"
+      ],
+      "lastUpdate": "2024-01-20T14:28:00Z"
+    },
+    {
+      "id": "amb-004",
+      "name": "AMB-004",
+      "plateNumber": "75-AMB-004",
+      "status": "maintenance",
+      "location": {
+        "lat": 48.8422,
+        "lng": 2.3214
+      },
+      "currentIncidentId": null,
+      "crew": {
+        "driver": "Luc Petit",
+        "medic": "Dr. Anne Rousseau"
+      },
+      "equipment": [
+        "Defibrillator",
+        "Oxygen Tank",
+        "First Aid Kit",
+        "Stretcher"
+      ],
+      "lastUpdate": "2024-01-20T13:00:00Z"
+    },
+    {
+      "id": "amb-005",
+      "name": "AMB-005",
+      "plateNumber": "75-AMB-005",
+      "status": "available",
+      "location": {
+        "lat": 48.8700,
+        "lng": 2.3300
+      },
+      "currentIncidentId": null,
+      "crew": {
+        "driver": "Thomas Durand",
+        "medic": "Dr. Julie Girard"
+      },
+      "equipment": [
+        "Defibrillator",
+        "Oxygen Tank",
+        "First Aid Kit",
+        "Stretcher",
+        "ECG Monitor"
+      ],
+      "lastUpdate": "2024-01-20T14:32:00Z"
     }
   ],
   "incidents": [
     {
-      "id": 1,
-      "position": { "lat": 48.8575, "lng": 2.3514 },
-      "address": "123 Rue de Paris, 75001 Paris",
-      "patient": "Jean Martin, 45 ans",
-      "severity": "high",
+      "id": "inc-001",
+      "title": "Accident de la route - Boulevard Saint-Germain",
+      "description": "Collision entre deux véhicules, plusieurs blessés signalés. Intervention urgente requise.",
+      "emergencyLevel": "high",
+      "location": {
+        "lat": 48.8606,
+        "lng": 2.3376,
+        "address": "Boulevard Saint-Germain, 75006 Paris"
+      },
+      "status": "in_progress",
+      "assignedAmbulanceId": "amb-002",
+      "reportedAt": "2024-01-20T14:15:00Z",
+      "assignedAt": "2024-01-20T14:18:00Z",
+      "startedAt": "2024-01-20T14:22:00Z",
+      "completedAt": null,
+      "reporter": {
+        "name": "Marie Lefebvre",
+        "phone": "+33612345678"
+      },
+      "patient": {
+        "name": "Jean Dupuis",
+        "age": 45,
+        "condition": "Traumatisme crânien, fractures multiples",
+        "vitalSigns": {
+          "heartRate": 95,
+          "bloodPressure": "120/80",
+          "oxygenSaturation": 98
+        }
+      }
+    },
+    {
+      "id": "inc-002",
+      "title": "Malaise cardiaque - Place de la République",
+      "description": "Personne âgée présentant des douleurs thoraciques et difficultés respiratoires.",
+      "emergencyLevel": "critical",
+      "location": {
+        "lat": 48.8676,
+        "lng": 2.3631,
+        "address": "Place de la République, 75011 Paris"
+      },
       "status": "pending",
       "assignedAmbulanceId": null,
-      "createdAt": "2024-01-15T10:25:00Z"
+      "reportedAt": "2024-01-20T14:35:00Z",
+      "assignedAt": null,
+      "startedAt": null,
+      "completedAt": null,
+      "reporter": {
+        "name": "Pierre Moreau",
+        "phone": "+33698765432"
+      },
+      "patient": {
+        "name": "Robert Martin",
+        "age": 72,
+        "condition": "Douleurs thoraciques, dyspnée",
+        "vitalSigns": {
+          "heartRate": 110,
+          "bloodPressure": "140/90",
+          "oxygenSaturation": 92
+        }
+      }
+    },
+    {
+      "id": "inc-003",
+      "title": "Chute - Rue de Rivoli",
+      "description": "Chute d'une personne dans un escalier, blessure à la jambe.",
+      "emergencyLevel": "medium",
+      "location": {
+        "lat": 48.8606,
+        "lng": 2.3296,
+        "address": "Rue de Rivoli, 75001 Paris"
+      },
+      "status": "assigned",
+      "assignedAmbulanceId": "amb-001",
+      "reportedAt": "2024-01-20T14:40:00Z",
+      "assignedAt": "2024-01-20T14:42:00Z",
+      "startedAt": null,
+      "completedAt": null,
+      "reporter": {
+        "name": "Sophie Bernard",
+        "phone": "+33611223344"
+      },
+      "patient": {
+        "name": "Claire Dubois",
+        "age": 35,
+        "condition": "Fracture probable de la jambe droite",
+        "vitalSigns": {
+          "heartRate": 85,
+          "bloodPressure": "115/75",
+          "oxygenSaturation": 99
+        }
+      }
+    },
+    {
+      "id": "inc-004",
+      "title": "Intoxication alimentaire - Montmartre",
+      "description": "Plusieurs personnes présentant des symptômes d'intoxication alimentaire.",
+      "emergencyLevel": "low",
+      "location": {
+        "lat": 48.8867,
+        "lng": 2.3431,
+        "address": "Rue Lepic, 75018 Paris"
+      },
+      "status": "pending",
+      "assignedAmbulanceId": null,
+      "reportedAt": "2024-01-20T14:45:00Z",
+      "assignedAt": null,
+      "startedAt": null,
+      "completedAt": null,
+      "reporter": {
+        "name": "Marc Lefevre",
+        "phone": "+33655667788"
+      },
+      "patient": {
+        "name": "Groupe de 3 personnes",
+        "age": null,
+        "condition": "Nausées, vomissements, douleurs abdominales",
+        "vitalSigns": null
+      }
     }
   ],
+  "historique": [
+    {
+      "id": "hist-001",
+      "incidentId": "inc-005",
+      "title": "Accident de la route - Avenue des Champs-Élysées",
+      "description": "Collision frontale, deux véhicules impliqués.",
+      "emergencyLevel": "high",
+      "location": {
+        "lat": 48.8698,
+        "lng": 2.3081,
+        "address": "Avenue des Champs-Élysées, 75008 Paris"
+      },
+      "status": "completed",
+      "assignedAmbulanceId": "amb-003",
+      "reportedAt": "2024-01-20T13:00:00Z",
+      "assignedAt": "2024-01-20T13:05:00Z",
+      "startedAt": "2024-01-20T13:10:00Z",
+      "completedAt": "2024-01-20T13:45:00Z",
+      "reporter": {
+        "name": "Lucie Martin",
+        "phone": "+33699887766"
+      },
+      "patient": {
+        "name": "Paul Durand",
+        "age": 38,
+        "condition": "Traumatisme, contusions multiples",
+        "vitalSigns": {
+          "heartRate": 88,
+          "bloodPressure": "125/82",
+          "oxygenSaturation": 97
+        }
+      },
+      "outcome": "Patient transporté à l'hôpital, état stable",
+      "responseTime": 5,
+      "interventionDuration": 35
+    },
+    {
+      "id": "hist-002",
+      "incidentId": "inc-006",
+      "title": "Malaise - Gare du Nord",
+      "description": "Personne présentant un malaise vagal dans la gare.",
+      "emergencyLevel": "medium",
+      "location": {
+        "lat": 48.8809,
+        "lng": 2.3553,
+        "address": "Gare du Nord, 75010 Paris"
+      },
+      "status": "completed",
+      "assignedAmbulanceId": "amb-001",
+      "reportedAt": "2024-01-20T12:30:00Z",
+      "assignedAt": "2024-01-20T12:32:00Z",
+      "startedAt": "2024-01-20T12:35:00Z",
+      "completedAt": "2024-01-20T12:55:00Z",
+      "reporter": {
+        "name": "Antoine Petit",
+        "phone": "+33644332211"
+      },
+      "patient": {
+        "name": "Marie Rousseau",
+        "age": 28,
+        "condition": "Malaise vagal, récupération rapide",
+        "vitalSigns": {
+          "heartRate": 72,
+          "bloodPressure": "110/70",
+          "oxygenSaturation": 99
+        }
+      },
+      "outcome": "Patient stabilisé sur place, refus de transport",
+      "responseTime": 2,
+      "interventionDuration": 20
+    },
+    {
+      "id": "hist-003",
+      "incidentId": "inc-007",
+      "title": "Brûlure - Quartier Latin",
+      "description": "Brûlure au deuxième degré suite à un accident domestique.",
+      "emergencyLevel": "medium",
+      "location": {
+        "lat": 48.8506,
+        "lng": 2.3447,
+        "address": "Rue de la Sorbonne, 75005 Paris"
+      },
+      "status": "completed",
+      "assignedAmbulanceId": "amb-005",
+      "reportedAt": "2024-01-20T11:15:00Z",
+      "assignedAt": "2024-01-20T11:18:00Z",
+      "startedAt": "2024-01-20T11:22:00Z",
+      "completedAt": "2024-01-20T12:00:00Z",
+      "reporter": {
+        "name": "Julie Girard",
+        "phone": "+33677889900"
+      },
+      "patient": {
+        "name": "Thomas Moreau",
+        "age": 42,
+        "condition": "Brûlure 2ème degré main droite",
+        "vitalSigns": {
+          "heartRate": 90,
+          "bloodPressure": "118/78",
+          "oxygenSaturation": 98
+        }
+      },
+      "outcome": "Patient transporté aux urgences pour traitement",
+      "responseTime": 3,
+      "interventionDuration": 38
+    },
+    {
+      "id": "hist-004",
+      "incidentId": "inc-008",
+      "title": "Arrêt cardiaque - Parc des Buttes-Chaumont",
+      "description": "Arrêt cardiaque, réanimation en cours.",
+      "emergencyLevel": "critical",
+      "location": {
+        "lat": 48.8833,
+        "lng": 2.3831,
+        "address": "Parc des Buttes-Chaumont, 75019 Paris"
+      },
+      "status": "completed",
+      "assignedAmbulanceId": "amb-002",
+      "reportedAt": "2024-01-20T10:00:00Z",
+      "assignedAt": "2024-01-20T10:02:00Z",
+      "startedAt": "2024-01-20T10:05:00Z",
+      "completedAt": "2024-01-20T10:35:00Z",
+      "reporter": {
+        "name": "François Bernard",
+        "phone": "+33611223344"
+      },
+      "patient": {
+        "name": "Henri Lefebvre",
+        "age": 65,
+        "condition": "Arrêt cardiaque, réanimation réussie",
+        "vitalSigns": {
+          "heartRate": 75,
+          "bloodPressure": "130/85",
+          "oxygenSaturation": 96
+        }
+      },
+      "outcome": "Réanimation réussie, patient transporté en urgence",
+      "responseTime": 2,
+      "interventionDuration": 30
+    }
+  ],
+  "statistics": {
+    "totalIncidents": 156,
+    "activeIncidents": 4,
+    "availableAmbulances": 3,
+    "averageResponseTime": 4.32,
+    "incidentsByLevel": {
+      "low": 45,
+      "medium": 68,
+      "high": 32,
+      "critical": 11
+    },
+    "incidentsByStatus": {
+      "pending": 2,
+      "assigned": 1,
+      "in_progress": 1,
+      "completed": 148,
+      "cancelled": 4
+    },
+    "todayStats": {
+      "incidentsToday": 8,
+      "completedToday": 4,
+      "averageResponseTimeToday": 3.5,
+      "ambulancesInService": 4
+    },
+    "weeklyStats": {
+      "incidentsThisWeek": 52,
+      "averageResponseTime": 4.1,
+      "completionRate": 94.2
+    }
+  },
   "activity": [
     {
-      "id": 1,
+      "id": "act-001",
       "type": "incident_created",
-      "description": "Nouvel incident créé - Urgence haute",
-      "timestamp": "2024-01-15T10:25:00Z"
+      "incidentId": "inc-002",
+      "description": "Nouvel incident créé - Malaise cardiaque (Critique)",
+      "timestamp": "2024-01-20T14:35:00Z",
+      "userId": "user-001",
+      "metadata": {
+        "emergencyLevel": "critical",
+        "location": "Place de la République"
+      }
+    },
+    {
+      "id": "act-002",
+      "type": "ambulance_assigned",
+      "incidentId": "inc-003",
+      "ambulanceId": "amb-001",
+      "description": "Ambulance AMB-001 assignée à l'incident inc-003",
+      "timestamp": "2024-01-20T14:42:00Z",
+      "userId": "user-001",
+      "metadata": {
+        "responseTime": 2
+      }
+    },
+    {
+      "id": "act-003",
+      "type": "incident_started",
+      "incidentId": "inc-001",
+      "ambulanceId": "amb-002",
+      "description": "Intervention démarrée pour l'incident inc-001",
+      "timestamp": "2024-01-20T14:22:00Z",
+      "userId": "user-002",
+      "metadata": {}
+    },
+    {
+      "id": "act-004",
+      "type": "incident_completed",
+      "incidentId": "inc-005",
+      "ambulanceId": "amb-003",
+      "description": "Incident inc-005 complété avec succès",
+      "timestamp": "2024-01-20T13:45:00Z",
+      "userId": "user-002",
+      "metadata": {
+        "duration": 35,
+        "outcome": "Patient transporté à l'hôpital, état stable"
+      }
+    },
+    {
+      "id": "act-005",
+      "type": "ambulance_status_changed",
+      "ambulanceId": "amb-004",
+      "description": "Statut de l'ambulance AMB-004 changé en maintenance",
+      "timestamp": "2024-01-20T13:00:00Z",
+      "userId": "user-003",
+      "metadata": {
+        "oldStatus": "available",
+        "newStatus": "maintenance"
+      }
     }
   ]
 }
