@@ -145,6 +145,7 @@ function DataTable<T extends Record<string, unknown>>({
   emptyMessage = "Aucune donnée disponible",
   className,
   ariaLabel = "Table de données",
+  onRowClick,
 }: TableProps<T>) {
   const handleSort = (columnKey: keyof T | string) => {
     if (!onSort) return
@@ -256,7 +257,11 @@ function DataTable<T extends Record<string, unknown>>({
               </TableRow>
             ) : (
               data.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
+                <TableRow 
+                  key={rowIndex}
+                  className={onRowClick ? "cursor-pointer hover:bg-muted/50" : ""}
+                  onClick={() => onRowClick?.(row)}
+                >
                   {columns.map((column) => {
                     const value = row[column.key as keyof T]
                     return (
