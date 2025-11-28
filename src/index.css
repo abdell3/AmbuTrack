@@ -2,6 +2,9 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
+
 /* Variables CSS pour le thème */
 @layer base {
   :root {

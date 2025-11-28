@@ -99,6 +99,33 @@ export const selectFilteredAmbulances = createSelector(
   }
 )
 
+// Selector that uses UI filters (from uiSlice)
+export const selectFilteredAmbulancesWithUIFilters = createSelector(
+  [selectAllAmbulances, (state: RootState) => state.ui.filters.ambulances],
+  (ambulances, filters) => {
+    let filtered = [...ambulances]
+
+    if (filters.status && filters.status.length > 0) {
+      filtered = filtered.filter((ambulance) =>
+        filters.status!.includes(ambulance.status)
+      )
+    }
+
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase()
+      filtered = filtered.filter(
+        (ambulance) =>
+          ambulance.name.toLowerCase().includes(searchLower) ||
+          ambulance.plateNumber.toLowerCase().includes(searchLower) ||
+          ambulance.crew.driver.toLowerCase().includes(searchLower) ||
+          ambulance.crew.medic.toLowerCase().includes(searchLower)
+      )
+    }
+
+    return filtered
+  }
+)
+
 export const selectAmbulancesByStatus = createSelector(
   [selectAllAmbulances],
   (ambulances) => {
