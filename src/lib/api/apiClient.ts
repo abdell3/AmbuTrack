@@ -24,12 +24,12 @@ async function fetchAPI<T>(
 
 export const api = {
   // Ambulances
-  getAmbulances: () => fetchAPI<{ data: unknown[] }>("/ambulances"),
+  getAmbulances: () => fetchAPI<unknown[]>("/ambulances"),
   
-  getAmbulance: (id: string) => fetchAPI<{ data: unknown }>(`/ambulances/${id}`),
+  getAmbulance: (id: string) => fetchAPI<unknown>(`/ambulances/${id}`),
   
   updateAmbulance: (id: string, updates: unknown) =>
-    fetchAPI<{ data: unknown }>(`/ambulances/${id}`, {
+    fetchAPI<unknown>(`/ambulances/${id}`, {
       method: "PATCH",
       body: JSON.stringify(updates),
     }),
@@ -39,29 +39,47 @@ export const api = {
     const queryString = params
       ? `?${new URLSearchParams(params).toString()}`
       : ""
-    return fetchAPI<{ data: unknown[] }>(`/incidents${queryString}`)
+    return fetchAPI<unknown[]>(`/incidents${queryString}`)
   },
   
-  getIncident: (id: string) => fetchAPI<{ data: unknown }>(`/incidents/${id}`),
+  getIncident: (id: string) => fetchAPI<unknown>(`/incidents/${id}`),
   
   createIncident: (data: unknown) =>
-    fetchAPI<{ data: unknown }>("/incidents", {
+    fetchAPI<unknown>("/incidents", {
       method: "POST",
       body: JSON.stringify(data),
     }),
   
   updateIncident: (id: string, updates: unknown) =>
-    fetchAPI<{ data: unknown }>(`/incidents/${id}`, {
+    fetchAPI<unknown>(`/incidents/${id}`, {
       method: "PATCH",
       body: JSON.stringify(updates),
     }),
   
   deleteIncident: (id: string) =>
-    fetchAPI<{ data: unknown }>(`/incidents/${id}`, {
+    fetchAPI<unknown>(`/incidents/${id}`, {
       method: "DELETE",
     }),
 
   // Statistics
-  getStatistics: () => fetchAPI<{ data: unknown }>("/statistics"),
+  getStatistics: () => fetchAPI<unknown>("/statistics"),
+  
+  // History
+  getHistory: (params?: Record<string, string>) => {
+    const queryString = params
+      ? `?${new URLSearchParams(params).toString()}`
+      : ""
+    return fetchAPI<unknown[]>(`/historique${queryString}`)
+  },
+  
+  getHistoryItem: (id: string) => fetchAPI<unknown>(`/historique/${id}`),
+  
+  // Activity
+  getActivity: (params?: Record<string, string>) => {
+    const queryString = params
+      ? `?${new URLSearchParams(params).toString()}`
+      : ""
+    return fetchAPI<unknown[]>(`/activity${queryString}`)
+  },
 }
 

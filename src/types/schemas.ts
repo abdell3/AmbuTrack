@@ -24,8 +24,9 @@ export const ambulanceSchema = z.object({
   plateNumber: z.string().min(1),
   status: ambulanceStatusSchema,
   location: ambulanceLocationSchema,
-  currentIncidentId: z.string().optional(),
+  currentIncidentId: z.string().nullable().optional(),
   crew: ambulanceCrewSchema,
+  equipment: z.array(z.string()).optional(),
   lastUpdate: z.string().datetime(),
 })
 
@@ -61,6 +62,20 @@ export const incidentReporterSchema = z.object({
   phone: z.string().min(1),
 })
 
+export const patientSchema = z.object({
+  name: z.string().min(1),
+  age: z.number().int().nullable(),
+  condition: z.string(),
+  vitalSigns: z
+    .object({
+      heartRate: z.number().int().min(0),
+      bloodPressure: z.string(),
+      oxygenSaturation: z.number().min(0).max(100),
+    })
+    .nullable()
+    .optional(),
+})
+
 export const incidentSchema = z.object({
   id: z.string(),
   title: z.string().min(1),
@@ -74,6 +89,7 @@ export const incidentSchema = z.object({
   startedAt: z.string().datetime().optional(),
   completedAt: z.string().datetime().optional(),
   reporter: incidentReporterSchema,
+  patient: patientSchema.optional(),
 })
 
 export const createIncidentSchema = z.object({
@@ -82,6 +98,7 @@ export const createIncidentSchema = z.object({
   emergencyLevel: emergencyLevelSchema,
   location: incidentLocationSchema,
   reporter: incidentReporterSchema,
+  patient: patientSchema.optional(),
 })
 
 export const updateIncidentSchema = z.object({
