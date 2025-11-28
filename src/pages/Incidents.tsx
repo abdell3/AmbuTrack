@@ -1,101 +1,130 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { useSearchParams } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { History, Plus, X } from "lucide-react"
-import { DataTable } from "@/components/ui/table"
-import { StatusBadge } from "@/components/incidents/StatusBadge"
+import { History, Plus, Download, X } from "lucide-react"
+import { IncidentList, IncidentDetails, HistoryFilters, type HistoryFiltersState } from "@/components/history"
 import { IncidentForm } from "@/components/incidents/IncidentForm"
-import { DispatchPanel } from "@/components/incidents/DispatchPanel"
-import { useIncidents } from "@/lib/api/queries"
-import { useAppSelector, useAppDispatch } from "@/store/hooks"
-import { setSelectedIncidentId } from "@/store/slices/uiSlice"
-import { selectSelectedIncidentId } from "@/store/slices/uiSlice"
-import { selectFilteredIncidents } from "@/store/slices/incidentsSlice"
-import type { Incident } from "@/types"
-import { Badge } from "@/components/ui/badge"
+import { useHistory } from "@/lib/api/queries"
+import type { Incident, EmergencyLevel } from "@/types"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { exportIncidentsToCSV, exportIncidentsToJSON } from "@/lib/utils/export"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Incidents() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [showForm, setShowForm] = useState(false)
-  const { data: incidents = [], isLoading } = useIncidents()
-  const filteredIncidents = useAppSelector(selectFilteredIncidents)
-  const selectedIncidentId = useAppSelector(selectSelectedIncidentId)
-  const dispatch = useAppDispatch()
+  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
+  const [showDetails, setShowDetails] = useState(false)
 
-  const selectedIncident = incidents.find((i) => i.id === selectedIncidentId)
+  // Parse filters from URL
+  const filtersFromURL = useMemo<HistoryFiltersState>(() => {
+    const filters: HistoryFiltersState = {}
+    
+    const search = searchParams.get("search")
+    if (search) filters.search = search
+
+    const emergencyLevel = searchParams.get("emergencyLevel")
+    if (emergencyLevel) {
+      filters.emergencyLevel = emergencyLevel.split(",") as EmergencyLevel[]
+    }
+
+    const status = searchParams.get("status")
+    if (status) {
+      filters.status = status.split(",") as Incident["status"][]
+    }
+
+    const ambulanceId = searchParams.get("ambulanceId")
+    if (ambulanceId) filters.ambulanceId = ambulanceId
+
+    const dateFrom = searchParams.get("dateFrom")
+    if (dateFrom) filters.dateFrom = dateFrom
+
+    const dateTo = searchParams.get("dateTo")
+    if (dateTo) filters.dateTo = dateTo
+
+    return filters
+  }, [searchParams])
+
+  // Convert filters to API format
+  const apiFilters = useMemo(() => {
+    const apiParams: Record<string, string> = {}
+    
+    if (filtersFromURL.search) {
+      apiParams.search = filtersFromURL.search
+    }
+    if (filtersFromURL.emergencyLevel && filtersFromURL.emergencyLevel.length > 0) {
+      apiParams.emergencyLevel = filtersFromURL.emergencyLevel.join(",")
+    }
+    if (filtersFromURL.status && filtersFromURL.status.length > 0) {
+      apiParams.status = filtersFromURL.status.join(",")
+    }
+    if (filtersFromURL.ambulanceId) {
+      apiParams.ambulanceId = filtersFromURL.ambulanceId
+    }
+    if (filtersFromURL.dateFrom) {
+      apiParams.dateFrom = filtersFromURL.dateFrom
+    }
+    if (filtersFromURL.dateTo) {
+      apiParams.dateTo = filtersFromURL.dateTo
+    }
+
+    return apiParams
+  }, [filtersFromURL])
+
+  const { data: incidents = [], isLoading } = useHistory(apiFilters)
+
+  // Filter incidents client-side for search
+  const filteredIncidents = useMemo(() => {
+    if (!filtersFromURL.search) return incidents
+
+    const searchLower = filtersFromURL.search.toLowerCase()
+    return incidents.filter(
+      (incident) =>
+        incident.title.toLowerCase().includes(searchLower) ||
+        incident.description.toLowerCase().includes(searchLower) ||
+        incident.location.address.toLowerCase().includes(searchLower) ||
+        incident.reporter.name.toLowerCase().includes(searchLower) ||
+        (incident.patient?.name &&
+          incident.patient.name.toLowerCase().includes(searchLower))
+    )
+  }, [incidents, filtersFromURL.search])
+
+  // Update URL when filters change
+  const handleFiltersChange = (newFilters: HistoryFiltersState) => {
+    const params = new URLSearchParams()
+
+    if (newFilters.search) params.set("search", newFilters.search)
+    if (newFilters.emergencyLevel && newFilters.emergencyLevel.length > 0) {
+      params.set("emergencyLevel", newFilters.emergencyLevel.join(","))
+    }
+    if (newFilters.status && newFilters.status.length > 0) {
+      params.set("status", newFilters.status.join(","))
+    }
+    if (newFilters.ambulanceId) params.set("ambulanceId", newFilters.ambulanceId)
+    if (newFilters.dateFrom) params.set("dateFrom", newFilters.dateFrom)
+    if (newFilters.dateTo) params.set("dateTo", newFilters.dateTo)
+
+    setSearchParams(params, { replace: true })
+  }
 
   const handleSelectIncident = (incident: Incident) => {
-    dispatch(setSelectedIncidentId(incident.id))
+    setSelectedIncident(incident)
+    setShowDetails(true)
   }
 
-  const handleClosePanel = () => {
-    dispatch(setSelectedIncidentId(null))
+  const handleExport = (format: "csv" | "json") => {
+    if (format === "csv") {
+      exportIncidentsToCSV(filteredIncidents, `incidents-${new Date().toISOString().split("T")[0]}.csv`)
+    } else {
+      exportIncidentsToJSON(filteredIncidents, `incidents-${new Date().toISOString().split("T")[0]}.json`)
+    }
   }
-
-  const columns = [
-    {
-      key: "title",
-      label: "Titre",
-      render: (value: unknown, row: Incident) => (
-        <div>
-          <div className="font-medium">{row.title}</div>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            {row.location.address}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "emergencyLevel",
-      label: "Niveau",
-      render: (value: unknown, row: Incident) => {
-        const levelLabels: Record<Incident["emergencyLevel"], string> = {
-          low: "Faible",
-          medium: "Moyenne",
-          high: "Élevée",
-          critical: "Critique",
-        }
-        return (
-          <Badge
-            variant={
-              row.emergencyLevel === "low"
-                ? "emergencyLow"
-                : row.emergencyLevel === "medium"
-                ? "emergencyMedium"
-                : row.emergencyLevel === "high"
-                ? "emergencyHigh"
-                : "emergencyCritical"
-            }
-          >
-            {levelLabels[row.emergencyLevel]}
-          </Badge>
-        )
-      },
-    },
-    {
-      key: "status",
-      label: "Statut",
-      render: (value: unknown, row: Incident) => <StatusBadge status={row.status} />,
-    },
-    {
-      key: "reportedAt",
-      label: "Signalé",
-      render: (value: unknown) => {
-        const date = new Date(value as string)
-        return (
-          <div className="text-sm">
-            <div>{date.toLocaleDateString("fr-FR")}</div>
-            <div className="text-xs text-muted-foreground">
-              {date.toLocaleTimeString("fr-FR", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </div>
-          </div>
-        )
-      },
-    },
-  ]
 
   return (
     <div className="space-y-6">
@@ -105,40 +134,62 @@ export function Incidents() {
             Historique des incidents
           </h1>
           <p className="text-muted-foreground mt-2">
-            Consultation et gestion des interventions
+            Journal des interventions passées
           </p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nouvel incident
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary">
+                <Download className="mr-2 h-4 w-4" />
+                Exporter
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport("csv")}>
+                Exporter en CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport("json")}>
+                Exporter en JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouvel incident
+          </Button>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5" />
-            Liste des incidents ({filteredIncidents.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <DataTable
-              data={filteredIncidents}
-              columns={columns}
-              loading={isLoading}
-              emptyMessage="Aucun incident trouvé"
-              ariaLabel="Table des incidents"
-              onRowClick={handleSelectIncident}
-            />
-            {filteredIncidents.length > 0 && (
-              <div className="text-sm text-muted-foreground">
-                Cliquez sur une ligne pour voir les détails et gérer l'incident
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 lg:grid-cols-4">
+        {/* Filters Sidebar */}
+        <div className="lg:col-span-1">
+          <HistoryFilters
+            filters={filtersFromURL}
+            onFiltersChange={handleFiltersChange}
+          />
+        </div>
+
+        {/* Main Content */}
+        <div className="lg:col-span-3 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5" />
+                Liste des incidents ({filteredIncidents.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <IncidentList
+                incidents={filteredIncidents}
+                loading={isLoading}
+                onSelectIncident={handleSelectIncident}
+                selectedIncidentId={selectedIncident?.id}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
@@ -152,23 +203,20 @@ export function Incidents() {
         </DialogContent>
       </Dialog>
 
-      {/* Dispatch Panel */}
-      {selectedIncident && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/50 z-40"
-            onClick={handleClosePanel}
-            aria-hidden="true"
-          />
-          <DispatchPanel
-            incident={selectedIncident}
-            onClose={handleClosePanel}
-            onUpdate={() => {
-              // Refresh data
-            }}
-          />
-        </>
-      )}
+      {/* Details Dialog */}
+      <Dialog open={showDetails} onOpenChange={setShowDetails}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          {selectedIncident && (
+            <IncidentDetails
+              incident={selectedIncident}
+              onClose={() => {
+                setShowDetails(false)
+                setSelectedIncident(null)
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
