@@ -42,18 +42,18 @@ export function Map() {
           </CardTitle>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span>
-              {filteredAmbulances.length} ambulance
-              {filteredAmbulances.length > 1 ? "s" : ""}
+              {ambulances.length} ambulance
+              {ambulances.length > 1 ? "s" : ""}
             </span>
             <span>
-              {filteredIncidents.length} incident
-              {filteredIncidents.length > 1 ? "s" : ""}
+              {incidents.length} incident
+              {incidents.length > 1 ? "s" : ""}
             </span>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 p-0">
+        <CardContent className="flex-1 p-0 overflow-hidden">
           {isLoading ? (
-            <div className="h-full flex items-center justify-center">
+            <div className="h-full flex items-center justify-center min-h-[500px]">
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 <p className="text-sm text-muted-foreground">
@@ -62,10 +62,10 @@ export function Map() {
               </div>
             </div>
           ) : (
-            <div className="h-full w-full relative">
+            <div className="h-full w-full relative min-h-[500px]">
               <MapContainer
-                ambulances={filteredAmbulances}
-                incidents={filteredIncidents}
+                ambulances={ambulances}
+                incidents={incidents}
                 showAmbulances={true}
                 showIncidents={true}
                 className="rounded-b-lg"

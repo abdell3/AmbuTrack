@@ -71,3 +71,6 @@ export default defineConfig([
   },
 ])
 ```
+
+
+Planification Jira : ["https://abdoabdell2000.atlassian.net/jira/software/projects/MBTRCK/boards/271?sprintStarted=true&atlOrigin=eyJpIjoiZTJlOGEyYTk2YzVlNDdmMTk4YmIzM2VmM2U0ZWZmZDEiLCJwIjoiaiJ9"]

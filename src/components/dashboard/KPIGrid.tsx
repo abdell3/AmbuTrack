@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { KPICard } from "@/components/ui/card"
+import { KPICard } from "@/components/dashboard/KPICard"
 import { AlertTriangle, Truck, Clock, Activity } from "lucide-react"
 import { useStatistics } from "@/lib/api/queries"
 import { useAmbulances } from "@/lib/api/queries"
@@ -44,57 +44,57 @@ export function KPIGrid() {
         value: activeIncidents,
         description: "En cours de traitement",
         trend: {
-          value: Math.abs(
-            activeIncidents - (statistics.incidentsByStatus.completed || 0)
-          ),
-          label: "vs terminés",
+          value: String(Math.abs(
+            activeIncidents - (statistics.incidentsByStatus?.completed || 0)
+          )) + "%",
+          period: "terminés",
           isPositive: false,
         },
-        icon: <AlertTriangle className="h-4 w-4" />,
+        icon: AlertTriangle,
       },
       {
         title: "Ambulances disponibles",
         value: availableAmbulances,
         description: `Sur ${totalAmbulances} au total`,
         trend: {
-          value: Math.round(
+          value: String(Math.round(
             ((availableAmbulances - (statistics.availableAmbulances || 0)) /
               Math.max(statistics.availableAmbulances || 1, 1)) *
               100
-          ),
-          label: "vs moyenne",
+          )) + "%",
+          period: "moyenne",
           isPositive:
             availableAmbulances >= (statistics.availableAmbulances || 0),
         },
-        icon: <Truck className="h-4 w-4" />,
+        icon: Truck,
       },
       {
         title: "Temps moyen de réponse",
         value: responseTimeFormatted,
         description: "Moyenne sur 24h",
         trend: {
-          value: Math.round(
+          value: String(Math.round(
             ((statistics.averageResponseTime - 5) / 5) * 100
-          ),
-          label: "vs objectif",
+          )) + "%",
+          period: "objectif",
           isPositive: statistics.averageResponseTime <= 5,
         },
-        icon: <Clock className="h-4 w-4" />,
+        icon: Clock,
       },
       {
         title: "Activité totale",
-        value: statistics.totalIncidents,
+        value: statistics.totalIncidents || 0,
         description: "Interventions aujourd'hui",
         trend: {
-          value: Math.round(
+          value: String(Math.round(
             ((statistics.totalIncidents - (statistics.todayStats?.incidentsToday || 0)) /
               Math.max(statistics.todayStats?.incidentsToday || 1, 1)) *
               100
-          ),
-          label: "vs hier",
+          )) + "%",
+          period: "hier",
           isPositive: true,
         },
-        icon: <Activity className="h-4 w-4" />,
+        icon: Activity,
       },
     ]
   }, [statistics, ambulances, incidents])
@@ -113,18 +113,35 @@ export function KPIGrid() {
     )
   }
 
+  if (kpis.length === 0) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className="h-32 bg-gray-100 animate-pulse rounded-lg"
+            aria-label="Chargement..."
+          />
+        ))}
+      </div>
+    )
+  }
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {kpis.map((kpi, index) => (
-        <KPICard
-          key={index}
-          title={kpi.title}
-          value={kpi.value}
-          description={kpi.description}
-          trend={kpi.trend}
-          icon={kpi.icon}
-        />
-      ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {kpis.map((kpi, index) => {
+        const Icon = kpi.icon
+        return (
+          <KPICard
+            key={index}
+            title={kpi.title}
+            value={kpi.value}
+            label={kpi.description}
+            trend={kpi.trend}
+            icon={Icon}
+          />
+        )
+      })}
     </div>
   )
 }

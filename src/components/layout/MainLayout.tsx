@@ -53,13 +53,17 @@ export function MainLayout() {
         isMobile={isMobile}
       />
       <div className="flex-1 flex flex-col lg:pl-64">
-        <Header />
-        <Breadcrumb />
+        <div className="sticky top-0 z-30">
+          <Header />
+          <Breadcrumb />
+        </div>
         <main
-          className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
+          className="flex-1 overflow-y-auto"
           role="main"
         >
-          <Outlet />
+          <div className="p-4 sm:p-6 lg:p-8">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

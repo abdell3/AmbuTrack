@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useIncidents } from "@/lib/api/queries"
 import { useNotifications } from "@/contexts/NotificationContext"
-import { CriticalIncidentsBanner } from "@/components/notifications/CriticalIncidentAlert"
+import { CriticalIncidentsBanner } from "@/components/notifications"
 
 export function CriticalIncidentsMonitor() {
   const { data: incidents = [] } = useIncidents()

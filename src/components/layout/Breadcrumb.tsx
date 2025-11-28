@@ -1,11 +1,6 @@
-import { Link, useLocation } from "react-router-dom"
-import { ChevronRight, Home } from "lucide-react"
+import { useLocation, Link } from "react-router-dom"
+import { Home, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-interface BreadcrumbItem {
-  label: string
-  path?: string
-}
 
 const routeLabels: Record<string, string> = {
   "/": "Dashboard",
@@ -18,67 +13,33 @@ export function Breadcrumb() {
   const location = useLocation()
   const pathnames = location.pathname.split("/").filter((x) => x)
 
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: "Accueil", path: "/" },
-    ...pathnames.map((value, index) => {
-      const to = `/${pathnames.slice(0, index + 1).join("/")}`
-      return {
-        label: routeLabels[to] || value.charAt(0).toUpperCase() + value.slice(1),
-        path: to,
-      }
-    }),
-  ]
-
-  // Don't show breadcrumb on home page
-  if (location.pathname === "/") {
-    return null
-  }
-
   return (
     <nav
-      aria-label="Fil d'Ariane"
-      className="flex items-center space-x-1 sm:space-x-2 text-sm text-muted-foreground px-4 sm:px-6 lg:px-8 py-3"
+      className="border-b border-border/40 bg-muted/30 px-4 sm:px-6 lg:px-8 py-1.5"
+      aria-label="Breadcrumb"
     >
-      <ol className="flex items-center space-x-1 sm:space-x-2" role="list">
-        {breadcrumbs.map((crumb, index) => {
-          const isLast = index === breadcrumbs.length - 1
-          return (
-            <li key={crumb.path || "current"} className="flex items-center" role="listitem">
-              {index === 0 ? (
-                <Link
-                  to={crumb.path || "/"}
-                  className="flex items-center hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                  aria-label="Retour à l'accueil"
-                >
-                  <Home className="h-4 w-4" aria-hidden="true" />
-                  <span className="sr-only">Accueil</span>
-                </Link>
-              ) : isLast ? (
-                <span
-                  className="text-foreground font-medium"
-                  aria-current="page"
-                >
-                  {crumb.label}
-                </span>
-              ) : (
-                <Link
-                  to={crumb.path || "#"}
-                  className="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  {crumb.label}
-                </Link>
-              )}
-              {!isLast && (
-                <ChevronRight
-                  className="h-4 w-4 mx-1 sm:mx-2 text-muted-foreground"
-                  aria-hidden="true"
-                />
-              )}
+      <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <li>
+          <Link
+            to="/"
+            className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+            aria-label="Accueil"
+          >
+            <Home className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Tableau de bord</span>
+          </Link>
+        </li>
+        {pathnames.length > 0 && (
+          <>
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" aria-hidden="true" />
+            <li>
+              <span className="text-foreground font-medium">
+                {routeLabels[location.pathname] || pathnames[pathnames.length - 1]}
+              </span>
             </li>
-          )
-        })}
+          </>
+        )}
       </ol>
     </nav>
   )
 }
-

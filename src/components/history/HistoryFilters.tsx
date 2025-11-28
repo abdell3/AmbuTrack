@@ -178,13 +178,13 @@ export function HistoryFilters({ filters, onFiltersChange }: HistoryFiltersProps
           <div>
             <SelectField
               label="Ambulance"
-              value={localFilters.ambulanceId || ""}
+              value={localFilters.ambulanceId || "all"}
               onValueChange={(value) =>
-                handleFilterChange("ambulanceId", value || undefined)
+                handleFilterChange("ambulanceId", value === "all" ? undefined : value)
               }
               placeholder="Toutes les ambulances"
             >
-              <SelectItem value="">Toutes les ambulances</SelectItem>
+              <SelectItem value="all">Toutes les ambulances</SelectItem>
               {ambulances.map((ambulance) => (
                 <SelectItem key={ambulance.id} value={ambulance.id}>
                   {ambulance.name} ({ambulance.plateNumber})
