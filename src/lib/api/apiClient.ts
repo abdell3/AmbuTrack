@@ -28,10 +28,21 @@ export const api = {
   
   getAmbulance: (id: string) => fetchAPI<unknown>(`/ambulances/${id}`),
   
+  createAmbulance: (data: unknown) =>
+    fetchAPI<unknown>("/ambulances", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  
   updateAmbulance: (id: string, updates: unknown) =>
     fetchAPI<unknown>(`/ambulances/${id}`, {
       method: "PATCH",
       body: JSON.stringify(updates),
+    }),
+  
+  deleteAmbulance: (id: string) =>
+    fetchAPI<unknown>(`/ambulances/${id}`, {
+      method: "DELETE",
     }),
 
   // Incidents

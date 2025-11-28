@@ -9,7 +9,7 @@ import type {
 } from "@/types"
 import { ambulanceSchema, incidentSchema, statisticsSchema } from "@/types/schemas"
 import { useAppDispatch } from "@/store/hooks"
-import { setAmbulances } from "@/store/slices/ambulancesSlice"
+import { setAmbulances, updateAmbulance as updateAmbulanceAction } from "@/store/slices/ambulancesSlice"
 import {
   setIncidents,
   addIncident,
@@ -362,8 +362,37 @@ export function useAssignAmbulance() {
   })
 }
 
+export function useCreateAmbulance() {
+  const queryClient = useQueryClient()
+  const dispatch = useAppDispatch()
+
+  return useMutation({
+    mutationFn: async (payload: {
+      name: string
+      plateNumber: string
+      status: Ambulance["status"]
+      location: { lat: number; lng: number }
+      crew: { driver: string; medic: string }
+      equipment?: string[]
+    }) => {
+      const response = await api.createAmbulance({
+        ...payload,
+        currentIncidentId: null,
+        lastUpdate: new Date().toISOString(),
+      })
+      return ambulanceSchema.parse(response) as Ambulance
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.ambulances })
+      const currentAmbulances = queryClient.getQueryData<Ambulance[]>(queryKeys.ambulances) || []
+      dispatch(setAmbulances([...currentAmbulances, data]))
+    },
+  })
+}
+
 export function useUpdateAmbulanceStatus() {
   const queryClient = useQueryClient()
+  const dispatch = useAppDispatch()
 
   return useMutation({
     mutationFn: async ({
@@ -373,12 +402,86 @@ export function useUpdateAmbulanceStatus() {
       id: string
       status: Ambulance["status"]
     }) => {
-      const response = await api.updateAmbulance(id, { status })
+      const response = await api.updateAmbulance(id, { 
+        status,
+        lastUpdate: new Date().toISOString(),
+      })
+      return ambulanceSchema.parse(response) as Ambulance
+    },
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.ambulance(id) })
+
+      const previousAmbulances = queryClient.getQueryData<Ambulance[]>(
+        queryKeys.ambulances
+      )
+
+      if (previousAmbulances) {
+        const optimisticAmbulances = previousAmbulances.map((ambulance) =>
+          ambulance.id === id
+            ? { ...ambulance, status, lastUpdate: new Date().toISOString() }
+            : ambulance
+        )
+        queryClient.setQueryData(queryKeys.ambulances, optimisticAmbulances)
+        dispatch(setAmbulances(optimisticAmbulances))
+      }
+
+      return { previousAmbulances }
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousAmbulances) {
+        queryClient.setQueryData(queryKeys.ambulances, context.previousAmbulances)
+        dispatch(setAmbulances(context.previousAmbulances))
+      }
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(queryKeys.ambulance(data.id), data)
+      queryClient.invalidateQueries({ queryKey: queryKeys.ambulances })
+    },
+  })
+}
+
+export function useUpdateAmbulance() {
+  const queryClient = useQueryClient()
+  const dispatch = useAppDispatch()
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string
+      updates: Partial<Ambulance>
+    }) => {
+      const response = await api.updateAmbulance(id, {
+        ...updates,
+        lastUpdate: new Date().toISOString(),
+      })
       return ambulanceSchema.parse(response) as Ambulance
     },
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.ambulance(data.id), data)
       queryClient.invalidateQueries({ queryKey: queryKeys.ambulances })
+      const currentAmbulances = queryClient.getQueryData<Ambulance[]>(queryKeys.ambulances) || []
+      dispatch(setAmbulances(
+        currentAmbulances.map(a => a.id === data.id ? data : a)
+      ))
+    },
+  })
+}
+
+export function useDeleteAmbulance() {
+  const queryClient = useQueryClient()
+  const dispatch = useAppDispatch()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await api.deleteAmbulance(id)
+      return id
+    },
+    onSuccess: (id) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.ambulances })
+      const currentAmbulances = queryClient.getQueryData<Ambulance[]>(queryKeys.ambulances) || []
+      dispatch(setAmbulances(currentAmbulances.filter(a => a.id !== id)))
     },
   })
 }

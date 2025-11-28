@@ -1,6 +1,7 @@
-import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, createSelector } from "@reduxjs/toolkit"
 import type { RootState } from "../store"
 import type { Incident, IncidentFilters } from "@/types"
+import type { PayloadAction } from "@reduxjs/toolkit"
 
 interface IncidentsState {
   items: Incident[]
