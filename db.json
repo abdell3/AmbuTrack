@@ -1,0 +1,33 @@
+{
+  "ambulances": [
+    {
+      "id": 1,
+      "name": "AMB-001",
+      "status": "available",
+      "position": { "lat": 48.8566, "lng": 2.3522 },
+      "crew": ["Dr. Dupont", "Inf. Martin"],
+      "equipment": ["Defibrillator", "Oxygen"],
+      "lastUpdate": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "incidents": [
+    {
+      "id": 1,
+      "position": { "lat": 48.8575, "lng": 2.3514 },
+      "address": "123 Rue de Paris, 75001 Paris",
+      "patient": "Jean Martin, 45 ans",
+      "severity": "high",
+      "status": "pending",
+      "assignedAmbulanceId": null,
+      "createdAt": "2024-01-15T10:25:00Z"
+    }
+  ],
+  "activity": [
+    {
+      "id": 1,
+      "type": "incident_created",
+      "description": "Nouvel incident créé - Urgence haute",
+      "timestamp": "2024-01-15T10:25:00Z"
+    }
+  ]
+}
