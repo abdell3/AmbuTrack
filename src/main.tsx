@@ -6,6 +6,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { store } from './store/store'
 import { queryClient } from './lib/api/queryClient'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { NotificationProvider } from './contexts/NotificationContext'
+import { Toaster } from './components/ui/toaster'
 import './index.css'
 import App from './App.tsx'
 
@@ -14,8 +16,11 @@ createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-          <App />
-          {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+          <NotificationProvider>
+            <App />
+            <Toaster />
+            {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+          </NotificationProvider>
         </QueryClientProvider>
       </Provider>
     </ErrorBoundary>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Truck, Plus } from "lucide-react"
 import { AmbulanceTable, AddAmbulanceDialog } from "@/components/fleet"
 import { useUpdateAmbulanceStatus, useUpdateAmbulance, useDeleteAmbulance } from "@/lib/api/queries"
+import { useMutationWithFeedback } from "@/hooks/use-mutation-with-feedback"
 import { useAmbulances } from "@/lib/api/queries"
 import type { Ambulance, AmbulanceStatus } from "@/types"
 import {
@@ -31,9 +32,24 @@ export function Fleet() {
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [editingAmbulance, setEditingAmbulance] = useState<Ambulance | null>(null)
   const { data: ambulances = [] } = useAmbulances()
-  const updateStatusMutation = useUpdateAmbulanceStatus()
-  const updateMutation = useUpdateAmbulance()
-  const deleteMutation = useDeleteAmbulance()
+  const updateStatusMutationBase = useUpdateAmbulanceStatus()
+  const updateMutationBase = useUpdateAmbulance()
+  const deleteMutationBase = useDeleteAmbulance()
+
+  const updateStatusMutation = useMutationWithFeedback(updateStatusMutationBase, {
+    successMessage: "Statut mis à jour avec succès",
+    errorMessage: "Erreur lors de la mise à jour du statut",
+  })
+
+  const updateMutation = useMutationWithFeedback(updateMutationBase, {
+    successMessage: "Ambulance mise à jour avec succès",
+    errorMessage: "Erreur lors de la mise à jour",
+  })
+
+  const deleteMutation = useMutationWithFeedback(deleteMutationBase, {
+    successMessage: "Ambulance retirée de la flotte",
+    errorMessage: "Erreur lors de la suppression",
+  })
 
   const {
     register,
@@ -66,11 +82,12 @@ export function Fleet() {
     newStatus: AmbulanceStatus
   ) => {
     try {
-      await updateStatusMutation.mutateAsync({
+      await updateStatusMutation.mutateWithFeedback({
         id: ambulance.id,
         status: newStatus,
       })
     } catch (error) {
+      // Error is handled by the mutation feedback
       console.error("Error updating status:", error)
     }
   }
@@ -79,7 +96,7 @@ export function Fleet() {
     if (!editingAmbulance) return
 
     try {
-      await updateMutation.mutateAsync({
+      await updateMutation.mutateWithFeedback({
         id: editingAmbulance.id,
         updates: {
           name: data.name,
@@ -94,6 +111,7 @@ export function Fleet() {
       setEditingAmbulance(null)
       reset()
     } catch (error) {
+      // Error is handled by the mutation feedback
       console.error("Error updating ambulance:", error)
     }
   }

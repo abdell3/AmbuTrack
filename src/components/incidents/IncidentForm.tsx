@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { SelectField, SelectItem } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateIncident } from "@/lib/api/queries"
+import { useNotifications } from "@/contexts/NotificationContext"
+import { useMutationWithFeedback } from "@/hooks/use-mutation-with-feedback"
 import { geocodeAddress } from "@/lib/utils/geocoding"
 import { Loader2, MapPin, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -20,7 +22,20 @@ interface IncidentFormProps {
 
 export function IncidentForm({ onSuccess, onCancel }: IncidentFormProps) {
   const [isGeocoding, setIsGeocoding] = useState(false)
-  const createMutation = useCreateIncident()
+  const createMutationBase = useCreateIncident()
+  const { showCriticalIncident } = useNotifications()
+  const createMutation = useMutationWithFeedback(createMutationBase, {
+    successTitle: "Incident créé",
+    successMessage: "L'incident a été créé avec succès",
+    errorTitle: "Erreur",
+    errorMessage: "Erreur lors de la création de l'incident",
+    onSuccess: (result) => {
+      if (result.emergencyLevel === "critical") {
+        showCriticalIncident(result)
+      }
+      onSuccess?.()
+    },
+  })
 
   const {
     register,
@@ -83,10 +98,9 @@ export function IncidentForm({ onSuccess, onCancel }: IncidentFormProps) {
 
   const onSubmit = async (data: CreateIncidentSchema) => {
     try {
-      await createMutation.mutateAsync(data)
-      onSuccess?.()
+      await createMutation.execute(data)
     } catch (error) {
-      // Error is handled by the mutation
+      // Error is handled by the mutation feedback
       console.error("Error creating incident:", error)
     }
   }
