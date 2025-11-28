@@ -113,6 +113,48 @@ export const selectFilteredIncidents = createSelector(
   }
 )
 
+// Selector that uses UI filters (from uiSlice)
+export const selectFilteredIncidentsWithUIFilters = createSelector(
+  [selectAllIncidents, (state: RootState) => state.ui.filters.incidents],
+  (incidents, filters) => {
+    let filtered = [...incidents]
+
+    if (filters.status && filters.status.length > 0) {
+      filtered = filtered.filter((incident) =>
+        filters.status!.includes(incident.status)
+      )
+    }
+
+    if (filters.emergencyLevel && filters.emergencyLevel.length > 0) {
+      filtered = filtered.filter((incident) =>
+        filters.emergencyLevel!.includes(incident.emergencyLevel)
+      )
+    }
+
+    if (filters.dateRange) {
+      filtered = filtered.filter((incident) => {
+        const reportedAt = new Date(incident.reportedAt)
+        const start = new Date(filters.dateRange!.start)
+        const end = new Date(filters.dateRange!.end)
+        return reportedAt >= start && reportedAt <= end
+      })
+    }
+
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase()
+      filtered = filtered.filter(
+        (incident) =>
+          incident.title.toLowerCase().includes(searchLower) ||
+          incident.description.toLowerCase().includes(searchLower) ||
+          incident.location.address.toLowerCase().includes(searchLower) ||
+          incident.reporter.name.toLowerCase().includes(searchLower)
+      )
+    }
+
+    return filtered
+  }
+)
+
 export const selectActiveIncidents = createSelector(
   [selectAllIncidents],
   (incidents) =>
