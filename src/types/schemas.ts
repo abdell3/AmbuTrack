@@ -35,6 +35,15 @@ export const ambulanceFiltersSchema = z.object({
   search: z.string().optional(),
 })
 
+export const createAmbulanceSchema = z.object({
+  name: z.string().min(1, "Le nom est requis"),
+  plateNumber: z.string().min(1, "Le numéro de plaque est requis"),
+  status: ambulanceStatusSchema.default("available"),
+  location: ambulanceLocationSchema,
+  crew: ambulanceCrewSchema,
+  equipment: z.array(z.string()).optional(),
+})
+
 // Incident schemas
 export const emergencyLevelSchema = z.enum([
   "low",
