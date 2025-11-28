@@ -3,6 +3,8 @@ import { Outlet, useLocation } from "react-router-dom"
 import { Navigation } from "./Navigation"
 import { Header } from "./Header"
 import { Breadcrumb } from "./Breadcrumb"
+import { CriticalIncidentsMonitor } from "./CriticalIncidentsMonitor"
+import { GlobalLoading } from "./GlobalLoading"
 
 export function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -43,6 +45,8 @@ export function MainLayout() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <GlobalLoading />
+      <CriticalIncidentsMonitor />
       <Navigation
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}

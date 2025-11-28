@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { useCreateAmbulance } from "@/lib/api/queries"
+import { useMutationWithFeedback } from "@/hooks/use-mutation-with-feedback"
 import { Loader2, AlertCircle, Plus } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useState } from "react"
@@ -31,7 +32,14 @@ export function AddAmbulanceDialog({
   onOpenChange,
   onSuccess,
 }: AddAmbulanceDialogProps) {
-  const createMutation = useCreateAmbulance()
+  const createMutationBase = useCreateAmbulance()
+  const createMutation = useMutationWithFeedback(createMutationBase, {
+    successMessage: "Ambulance créée avec succès",
+    errorMessage: "Erreur lors de la création de l'ambulance",
+    onSuccess: () => {
+      onSuccess?.()
+    },
+  })
   const [equipmentItems, setEquipmentItems] = useState<string[]>([])
 
   const {
@@ -76,12 +84,12 @@ export function AddAmbulanceDialog({
 
   const onSubmit = async (data: CreateAmbulanceForm) => {
     try {
-      await createMutation.mutateAsync(data)
+      await createMutation.mutateWithFeedback(data)
       reset()
       setEquipmentItems([])
       onOpenChange(false)
-      onSuccess?.()
     } catch (error) {
+      // Error is handled by the mutation feedback
       console.error("Error creating ambulance:", error)
     }
   }
