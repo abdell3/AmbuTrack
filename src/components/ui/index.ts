@@ -65,3 +65,5 @@ export type {
 
 export { Label } from "./label"
 
+export { Alert, AlertTitle, AlertDescription } from "./alert"
+
