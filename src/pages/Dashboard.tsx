@@ -1,5 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle, KPICard } from "@/components/ui/card"
-import { Activity, AlertTriangle, Truck, Clock } from "lucide-react"
+import { KPIGrid, ActivityFeed, PerformanceChart } from "@/components/dashboard"
 
 export function Dashboard() {
   return (
@@ -11,60 +10,17 @@ export function Dashboard() {
         </p>
       </div>
 
-      {/* KPIs */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <KPICard
-          title="Incidents actifs"
-          value={12}
-          description="En cours de traitement"
-          trend={{ value: 5, label: "vs hier", isPositive: false }}
-          icon={<AlertTriangle className="h-4 w-4" />}
-        />
-        <KPICard
-          title="Ambulances disponibles"
-          value={8}
-          description="Sur 15 au total"
-          trend={{ value: 2, label: "vs hier", isPositive: true }}
-          icon={<Truck className="h-4 w-4" />}
-        />
-        <KPICard
-          title="Temps moyen de réponse"
-          value="4m 32s"
-          description="Moyenne sur 24h"
-          trend={{ value: 8, label: "vs hier", isPositive: true }}
-          icon={<Clock className="h-4 w-4" />}
-        />
-        <KPICard
-          title="Activité totale"
-          value={156}
-          description="Interventions aujourd'hui"
-          trend={{ value: 12, label: "vs hier", isPositive: true }}
-          icon={<Activity className="h-4 w-4" />}
-        />
-      </div>
+      {/* KPIs Grid */}
+      <KPIGrid />
 
-      {/* Additional content */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Activité récente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Aucune activité récente à afficher
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Statistiques</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Statistiques à venir
-            </p>
-          </CardContent>
-        </Card>
+      {/* Charts and Activity */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <PerformanceChart />
+        </div>
+        <div>
+          <ActivityFeed />
+        </div>
       </div>
     </div>
   )
