@@ -74,3 +74,6 @@ export default defineConfig([
 
 
 Planification Jira : ["https://abdoabdell2000.atlassian.net/jira/software/projects/MBTRCK/boards/271?sprintStarted=true&atlOrigin=eyJpIjoiZTJlOGEyYTk2YzVlNDdmMTk4YmIzM2VmM2U0ZWZmZDEiLCJwIjoiaiJ9"]
+
+
+Figma : [https://www.figma.com/design/famZZlRyhV9gfAIoRaaPgy/brief?node-id=0-1&t=reWPghlBhLAe04nd-1]

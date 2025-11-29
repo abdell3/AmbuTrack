@@ -8,8 +8,23 @@ import { queryClient } from './lib/api/queryClient'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { NotificationProvider } from './contexts/NotificationContext'
 import { Toaster } from './components/ui/toaster'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import icon from 'leaflet/dist/images/marker-icon.png'
+import iconShadow from 'leaflet/dist/images/marker-shadow.png'
 import './index.css'
 import App from './App.tsx'
+
+// Fix Leaflet default icon
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+})
+L.Marker.prototype.options.icon = DefaultIcon
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -44,7 +44,7 @@ export function MainLayout() {
   }, [location.pathname])
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex">
       <GlobalLoading />
       <CriticalIncidentsMonitor />
       <Navigation
@@ -52,8 +52,8 @@ export function MainLayout() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         isMobile={isMobile}
       />
-      <div className="flex-1 flex flex-col lg:pl-64">
-        <div className="sticky top-0 z-30">
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="sticky top-0 z-30 bg-background">
           <Header />
           <Breadcrumb />
         </div>

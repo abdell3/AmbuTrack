@@ -94,12 +94,13 @@ export function MapContainer({
   }, [center, ambulances, incidents, showAmbulances, showIncidents])
 
   return (
-    <div className={`relative w-full h-full ${className}`}>
+    <div className={`relative w-full h-full ${className}`} style={{ height: "100%" }}>
       <LeafletMapContainer
         center={mapCenter}
         zoom={zoom}
         scrollWheelZoom={true}
-        className="h-full w-full z-0"
+        style={{ height: "100%", width: "100%" }}
+        className="z-0"
         zoomControl={true}
       >
         <TileLayer
