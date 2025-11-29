@@ -44,7 +44,7 @@ export function MainLayout() {
   }, [location.pathname])
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex">
       <GlobalLoading />
       <CriticalIncidentsMonitor />
       <Navigation
@@ -52,14 +52,18 @@ export function MainLayout() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         isMobile={isMobile}
       />
-      <div className="flex-1 flex flex-col lg:pl-64">
-        <Header />
-        <Breadcrumb />
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="sticky top-0 z-30 bg-background">
+          <Header />
+          <Breadcrumb />
+        </div>
         <main
-          className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
+          className="flex-1 overflow-y-auto"
           role="main"
         >
-          <Outlet />
+          <div className="p-4 sm:p-6 lg:p-8">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

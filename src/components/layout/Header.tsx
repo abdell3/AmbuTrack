@@ -1,8 +1,17 @@
-import { Bell, User, Moon, Sun } from "lucide-react"
+import { Bell, User, Moon, Sun, Search, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
+import { Input } from "@/components/ui/input"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface HeaderProps {
   userName?: string
@@ -11,6 +20,7 @@ interface HeaderProps {
 
 export function Header({ userName = "Utilisateur", notificationCount = 0 }: HeaderProps) {
   const [darkMode, setDarkMode] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark")
@@ -28,30 +38,55 @@ export function Header({ userName = "Utilisateur", notificationCount = 0 }: Head
   }
 
   return (
-    <header
-      className="sticky top-0 z-30 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-      role="banner"
-    >
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-foreground hidden sm:block">
-            Tableau de bord
-          </h2>
+    <header className="h-[60px] bg-white border-b border-gray-200 w-full">
+      <div className="flex items-center justify-between h-full px-4 py-2 max-w-full">
+        {/* Left side - Search */}
+        <div className="flex items-center gap-2 flex-1 max-w-md">
+          {showSearch ? (
+            <div className="flex-1 relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Rechercher..."
+                className="pl-8 pr-8 h-8 text-sm border-gray-300"
+                autoFocus
+                onBlur={() => setShowSearch(false)}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
+                onClick={() => setShowSearch(false)}
+              >
+                ×
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSearch(true)}
+              className="gap-1.5 h-8 px-2 text-gray-600 hover:text-gray-900 text-sm"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline text-xs">Rechercher...</span>
+            </Button>
+          )}
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-4">
+        {/* Right side - Actions */}
+        <div className="flex items-center gap-1">
           {/* Dark mode toggle */}
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleDarkMode}
             aria-label={darkMode ? "Activer le mode clair" : "Activer le mode sombre"}
-            className="h-9 w-9"
+            className="h-8 w-8 text-gray-600 hover:text-gray-900"
           >
             {darkMode ? (
-              <Sun className="h-5 w-5" aria-hidden="true" />
+              <Sun className="h-4 w-4" aria-hidden="true" />
             ) : (
-              <Moon className="h-5 w-5" aria-hidden="true" />
+              <Moon className="h-4 w-4" aria-hidden="true" />
             )}
           </Button>
 
@@ -59,15 +94,15 @@ export function Header({ userName = "Utilisateur", notificationCount = 0 }: Head
           <Button
             variant="ghost"
             size="icon"
-            className="relative h-9 w-9"
+            className="relative h-8 w-8 text-gray-600 hover:text-gray-900"
             aria-label={`Notifications${notificationCount > 0 ? ` (${notificationCount} non lues)` : ""}`}
           >
-            <Bell className="h-5 w-5" aria-hidden="true" />
+            <Bell className="h-4 w-4" aria-hidden="true" />
             {notificationCount > 0 && (
               <Badge
                 variant="destructive"
                 className={cn(
-                  "absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  "absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px] font-semibold bg-red-600"
                 )}
                 aria-label={`${notificationCount} notifications non lues`}
               >
@@ -76,24 +111,56 @@ export function Header({ userName = "Utilisateur", notificationCount = 0 }: Head
             )}
           </Button>
 
+          {/* Settings */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-600 hover:text-gray-900"
+            aria-label="Paramètres"
+          >
+            <Settings className="h-4 w-4" aria-hidden="true" />
+          </Button>
+
           {/* User menu */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden sm:flex sm:flex-col sm:items-end">
-              <span className="text-sm font-medium text-foreground">{userName}</span>
-              <span className="text-xs text-muted-foreground">Opérateur</span>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full"
-              aria-label="Menu utilisateur"
-            >
-              <User className="h-5 w-5" aria-hidden="true" />
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="h-8 px-2 gap-1.5 hover:bg-gray-100"
+                aria-label="Menu utilisateur"
+              >
+                <div className="h-7 w-7 rounded-full bg-blue-600 flex items-center justify-center">
+                  <User className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                </div>
+                <div className="hidden sm:flex sm:flex-col sm:items-start">
+                  <span className="text-xs font-semibold text-gray-900 leading-tight">
+                    {userName}
+                  </span>
+                  <span className="text-[10px] text-gray-600 leading-tight">
+                    Opérateur
+                  </span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profil</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Paramètres</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <span>Déconnexion</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
   )
 }
-
